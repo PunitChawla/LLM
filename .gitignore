@@ -1,0 +1,54 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.egg-info/
+
+# Jupyter
+*.ipynb_checkpoints
+
+# VS Code
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.venv/
+venv/
+
+# Data & Models
+checkpoints/
+voice_models/
+models/
+indexes/
+*.npy
+*.jsonl
+*.csv
+*.pt
+*.bin
+*.safetensors
+.cache/
+
+# Misc
+*.log
+*.tmp
+*.bak
+
+# Workflow
+workflow.ps1
+
+# Others
+*.zip
+*.tar.gz
+
+# Don't ignore source and config
+!app/
+!requirements.txt
+!README.md
+!placement_qa_dataset_large.csv
