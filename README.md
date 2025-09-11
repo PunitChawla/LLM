@@ -23,18 +23,21 @@ This project builds a local question-answering chatbot tailored to your college 
 - `app/build_index.py`: Encodes all items and builds a fast cosine-similarity index
 - `app/retriever.py`: Loads model + index and performs search
 - `app/chat.py`: Interactive CLI that answers queries using the best match and tags
-- `app/voice_speech.py`: Speech-to-text (Vosk) and text-to-speech (pyttsx3)
-- `app/voice_wake_and_chat.py`: Voice wake phrase + voice Q&A loop
+- `app/voice_speech.py`: Speech-to-text (Google Cloud API) and text-to-speech (gTTS)
+- `app/voice_wake_and_chat.py`: Direct voice Q&A loop (no wake phrases needed)
 - `workflow.ps1`: Orchestrates train/index/chat and voice setup/chat
 
 ### Voice Mode
 
-- Setup Vosk model (one-time):
-  - `powershell -ExecutionPolicy Bypass -File .\workflow.ps1 -VoiceSetup`
-- Start voice chat:
-  - `powershell -ExecutionPolicy Bypass -File .\workflow.ps1 -VoiceChat`
+**Setup:**
+1. Set your Google Cloud Speech API key in `.env` file:
+   ```
+   GOOGLE_CLOUD_API_KEY=your_api_key_here
+   ```
+2. Start voice chat:
+   - `powershell -ExecutionPolicy Bypass -File .\workflow.ps1 -VoiceChat`
 
-Wake phrase: say `hello wake up`. The bot will greet you and listen for your question, then speak the answer. Typing mode remains available with the standard chat command.
+**Usage:** Simply speak your question directly - no wake phrases needed! The bot will listen, transcribe your question, and speak the answer back. Typing mode remains available with the standard chat command.
 
 ### Notes
 

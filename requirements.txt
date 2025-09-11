@@ -1,3 +1,4 @@
+# Core ML and data processing
 numpy>=1.26.0
 pandas>=2.2.2
 scikit-learn>=1.5.0
@@ -6,10 +7,20 @@ torch>=2.2.0
 transformers>=4.42.3
 datasets>=2.14.0
 accelerate>=0.26.0
+
+# Text processing and search
+rapidfuzz>=3.9.6
+
+# UI and CLI
 rich>=13.7.1
 typer>=0.12.3
+
+# Configuration
 pyyaml>=6.0.1
-vosk>=0.3.45
-sounddevice>=0.4.6
-pyttsx3>=2.90
-rapidfuzz>=3.9.6
+python-dotenv>=1.0.0
+
+# Voice functionality (Google Cloud only)
+pyaudio>=0.2.11
+gtts>=2.3.0
+playsound==1.2.2
+requests>=2.25.0

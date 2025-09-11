@@ -14,6 +14,7 @@ def main() -> None:
     parser.add_argument("--voice-chat", action="store_true", help="Start voice chat with wake phrase")
     parser.add_argument("--device", type=int, default=None, help="Input device index to use")
     parser.add_argument("--debug", action="store_true", help="Print partial ASR results while listening")
+    parser.add_argument("--google-api-key", type=str, default=None, help="Path to Google Cloud service account JSON file")
     args = parser.parse_args()
 
     if args.list_audio:
@@ -21,7 +22,7 @@ def main() -> None:
         return
 
     if args.voice_chat:
-        voice_chat(device_index=args.device, debug=args.debug)
+        voice_chat(device_index=args.device, debug=args.debug, google_api_key=args.google_api_key)
         return
 
     parser.print_help()

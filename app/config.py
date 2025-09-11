@@ -2,6 +2,13 @@ import os
 from dataclasses import dataclass
 from typing import List
 
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    pass  # dotenv not installed, skip loading .env file
+
 
 @dataclass
 class Paths:
@@ -35,15 +42,15 @@ def ensure_directories() -> None:
     os.makedirs(os.path.dirname(paths.model_dir), exist_ok=True)
     os.makedirs(paths.model_dir, exist_ok=True)
     os.makedirs(paths.index_dir, exist_ok=True)
-
+    
 
 # Voice configuration
 @dataclass
 class VoiceConfig:
-    wake_phrases: List[str] = ("arya", "arya chat bot", "hello")
     sample_rate: int = 16000
-    vosk_model_url: str = "https://alphacephei.com/vosk/models/vosk-model-small-en-us-0.15.zip"
-    vosk_model_dir: str = os.path.join(os.getcwd(), "voice_models", "vosk-model-small-en-us-0.15")
+    # Google Cloud Speech-to-Text configuration
+    google_cloud_api_key: str = os.getenv("GOOGLE_CLOUD_API_KEY", "")
+    google_cloud_project_id: str = os.getenv("GOOGLE_CLOUD_PROJECT_ID", "")
 
 
 voice_cfg = VoiceConfig()

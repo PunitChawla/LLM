@@ -7,6 +7,10 @@ __pycache__/
 *.sqlite3
 *.egg-info/
 
+# Environment and API keys
+.env
+*.json
+
 # Jupyter
 *.ipynb_checkpoints
 
@@ -21,7 +25,7 @@ Thumbs.db
 .env
 .venv/
 venv/
-
+.venv310
 # Data & Models
 checkpoints/
 voice_models/
