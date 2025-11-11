@@ -31,7 +31,7 @@ def voice_chat(device_index: int | None = None, debug: bool = False, google_api_
 
     greeting = "Hello, my name is Arya Chatbot. I'm ready to answer your questions!"
     console.print(Panel(greeting, title="Voice Chat Ready"))
-    tts.say(greeting)
+    tts.say(greeting, asr)  # Pass ASR for interrupt capability
 
     import time
     while True:
@@ -62,10 +62,10 @@ def voice_chat(device_index: int | None = None, debug: bool = False, google_api_
         if not norm_q:
             if debug:
                 print("[Debug] No valid question detected")
-            tts.say("I didn't hear a question. Please ask again or say 'exit' to quit.")
+            tts.say("I didn't hear a question. Please ask again or say 'exit' to quit.", asr)
             continue
         if norm_q in {"exit", "quit", "bye"}:
-            tts.say("Goodbye!")
+            tts.say("Goodbye!", asr)
             return
         
         # Get answer and respond quickly
@@ -77,7 +77,12 @@ def voice_chat(device_index: int | None = None, debug: bool = False, google_api_
             answer = str(hit.get("answers", "")).strip() or "I could not find an answer."
 
         console.print(Panel(f"You: {question}\nAnswer: {answer}", title="Response"))
-        tts.say(answer)
+        console.print("🎧 Speaking... (Press SPACE or ENTER to interrupt)", style="dim")
+        tts.say(answer, asr)  # Pass ASR for interrupt capability
+        
+        # Small delay to separate speech from next listening
+        import time
+        time.sleep(0.5)
 
 
 if __name__ == "__main__":

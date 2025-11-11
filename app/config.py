@@ -12,7 +12,7 @@ except ImportError:
 
 @dataclass
 class Paths:
-    data_path: str = os.path.join(os.getcwd(), "placment_qa_data_set_2.csv")
+    data_path: str = os.path.join(os.getcwd(), "VICA_DATASET_UPDATION.csv")
     model_dir: str = os.path.join(os.getcwd(), "models", "bi_encoder")
     index_dir: str = os.path.join(os.getcwd(), "indexes")
 

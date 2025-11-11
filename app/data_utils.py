@@ -16,7 +16,20 @@ CSV_COLUMNS = [
 
 
 def load_dataset(csv_path: str) -> pd.DataFrame:
-    df = pd.read_csv(csv_path)
+    # Try different encodings to handle various file formats
+    encodings = ['utf-8', 'utf-8-sig', 'latin-1', 'cp1252', 'iso-8859-1']
+    
+    for encoding in encodings:
+        try:
+            df = pd.read_csv(csv_path, encoding=encoding)
+            print(f"Successfully loaded CSV with {encoding} encoding")
+            break
+        except UnicodeDecodeError:
+            print(f"Failed to load with {encoding} encoding, trying next...")
+            continue
+    else:
+        raise ValueError(f"Could not load CSV file with any of the tried encodings: {encodings}")
+    
     # Ensure expected columns exist
     missing = [c for c in CSV_COLUMNS if c not in df.columns]
     if missing:

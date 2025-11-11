@@ -35,33 +35,17 @@ def list_input_devices() -> list[dict]:
     return devices
 
 
-# Global TTS instance to prevent multiple simultaneous speeches
-_global_tts_instance = None
-
 class TextToSpeech:
-    """Text-to-Speech using Google Text-to-Speech (gTTS) with proper interrupt functionality"""
+    """Text-to-Speech using Google Text-to-Speech (gTTS)"""
     
     def __init__(self) -> None:
-        global _global_tts_instance
-        if _global_tts_instance:
-            _global_tts_instance.stop()  # Stop any existing instance
-        _global_tts_instance = self
-        
-        self.is_playing = False
-        self.should_stop = False
+        pass
 
-    def say(self, text: str, asr=None) -> None:
-        """Convert text to speech and play it with clean interrupt capability."""
+    def say(self, text: str) -> None:
+        """Convert text to speech and play it."""
         try:
             from gtts import gTTS
-            import threading
-            
-            # Stop any existing speech first
-            self.stop()
-            
-            # Reset interrupt flag
-            self.should_stop = False
-            self.is_playing = True
+            from playsound import playsound
             
             # Create TTS audio
             tts = gTTS(text=text, lang='en', slow=False)
@@ -71,79 +55,11 @@ class TextToSpeech:
                 temp_path = fp.name
             
             tts.save(temp_path)
-            
-            # Start keyboard interrupt listener
-            keyboard_thread = threading.Thread(target=self._listen_for_keyboard_interrupt)
-            keyboard_thread.daemon = True
-            keyboard_thread.start()
-            
-            # Use playsound but in a separate process for better control
-            try:
-                from playsound import playsound
-                
-                # Create a wrapper function that can be interrupted
-                def play_audio():
-                    try:
-                        playsound(temp_path)
-                    except Exception as e:
-                        print(f"Audio playback error: {e}")
-                
-                # Start playing in a thread
-                play_thread = threading.Thread(target=play_audio)
-                play_thread.daemon = True
-                play_thread.start()
-                
-                # Wait for playback to finish or be interrupted
-                while play_thread.is_alive() and not self.should_stop:
-                    import time
-                    time.sleep(0.1)  # Check every 100ms
-                
-                if self.should_stop:
-                    print("🛑 Speech interrupted!")
-                    # Note: playsound can't be cleanly stopped mid-playback,
-                    # but we can prevent the next speech from starting
-                
-            except Exception as e:
-                print(f"Audio playback failed: {e}")
-            
-            self.is_playing = False
-            
-            # Clean up
-            try:
-                os.remove(temp_path)
-            except:
-                pass
+            playsound(temp_path)
+            os.remove(temp_path)
             
         except Exception as e:
             print(f"TTS failed: {e}")
-            self.is_playing = False
-
-    def _listen_for_keyboard_interrupt(self) -> None:
-        """Listen for keyboard input to interrupt speech."""
-        try:
-            import sys
-            
-            while self.is_playing and not self.should_stop:
-                # Check if there's keyboard input available (non-blocking)
-                if sys.platform == "win32":
-                    import msvcrt
-                    if msvcrt.kbhit():
-                        key = msvcrt.getch()
-                        if key in [b' ', b'\r', b'\n', b's', b'S']:  # Space, Enter, or 's' key
-                            print("🛑 Keyboard interrupt detected!")
-                            self.should_stop = True
-                            break
-                
-                import time
-                time.sleep(0.1)
-                
-        except Exception as e:
-            pass  # Ignore keyboard interrupt errors
-
-    def stop(self) -> None:
-        """Manually stop current speech and clean up."""
-        self.should_stop = True
-        self.is_playing = False
 
 
 class SpeechRecognizer:
@@ -173,7 +89,7 @@ class SpeechRecognizer:
         if self.debug:
             print(f"✅ Using Google Cloud Speech API with PyAudio")
 
-    def listen_once(self, seconds: float = 5.0, timeout: float = None) -> str:
+    def listen_once(self, seconds: float = 5.0) -> str:
         """Record audio and transcribe using Google Cloud Speech API."""
         if self.debug:
             print(f"🎤 Recording for {seconds} seconds...")
@@ -255,121 +171,31 @@ class SpeechRecognizer:
                     # Add speech contexts for better recognition of specific terms
                     "speechContexts": [{
                         "phrases": [
-                            # Faculty names from dataset
                             "Mohit Mishra",
-                            "Abhay Bansal", 
-                            "Salil Bharany",
-                            "Abhishek Bharti",
                             "Arun Arya",
                             "Dr. Arun Arya",
                             "Prof. Arun Arya",
                             "Professor Arun Arya",
-                            "Dr. Mohit Mishra",
-                            "Prof. Mohit Mishra",
-                            "Professor Mohit Mishra",
-                            
-                            # College and institution names
-                            "Arya College",
-                            "Computer Science Department",
-                            "AI Lab",
-                            "Artificial Intelligence Lab",
-                            
-                            # Company names from placement data
-                            "Flipkart",
-                            "Amazon", 
-                            "Infosys",
-                            "DeltaX",
-                            "HDFC Life",
-                            "HDFC",
-                            "Hashedin by Deloitte",
-                            "Hashedin",
-                            "Deloitte",
-                            "Tata Consultancy Services",
-                            "TCS",
-                            "Tech Mahindra",
-                            "Wipro",
-                            "Cognizant",
-                            "Accenture",
-                            "Capgemini",
-                            
-                            # Department and branch names
-                            "Computer Science Engineering",
-                            "CSE",
-                            "Information Technology", 
-                            "IT",
-                            "Artificial Intelligence and Data Science",
-                            "AIDS",
-                            "Data Science",
-                            "Electronics and Communication Engineering",
-                            "ECE",
-                            "Electronics",
-                            "Electrical Engineering",
-                            "EE",
-                            "Mechanical Engineering",
-                            "ME",
-                            "Civil Engineering",
-                            "Master of Business Administration",
-                            "MBA",
-                            "B.Tech",
-                            "BTech",
-                            "Bachelor of Technology",
-                            
-                            # Placement and career terms
-                            "placement",
-                            "placements", 
-                            "campus placement",
-                            "campus visit",
-                            "recruitments",
-                            "recruitment",
-                            "package",
-                            "salary",
-                            "CTC",
-                            "LPA",
-                            "placement drive",
-                            "eligible branches",
-                            "visiting date",
-                            "campus interview",
-                            "job offer",
-                            "recruitment process",
-                            "offer letter",
-                            "internship",
-                            
-                            # Academic and general terms
-                            "admission",
-                            "admissions",
                             "faculty",
-                            "professor",
+                            "professor", 
                             "sir",
-                            "ma'am", 
+                            "ma'am",
                             "teacher",
                             "department",
+                            "Mechanical Engineering",
+                            "Computer Science Engineering",
+                            "Electrical Engineering",
+                            "Civil Engineering",
+                            "Electronics and Communication Engineering",
+                            "Information Technology",
+                            "CSE",
+                            "ECE",
+                            "IT",
                             "HOD",
                             "Head of Department",
-                            "course",
-                            "semester",
-                            "engineering",
-                            "technology",
-                            "student",
-                            "college",
-                            "university",
-                            "degree",
-                            "graduation",
-                            "undergraduate",
-                            "postgraduate",
-                            "session",
-                            "academic year",
-                            "curriculum",
-                            "syllabus",
-                            "examination",
-                            "exam",
-                            "results",
-                            "fees",
-                            "scholarship",
-                            "hostel",
-                            "campus",
-                            "laboratory",
-                            "lab",
-                            "library"
+                            "Arya College",
+                            "placement",
+                            "admission"
                         ],
                         "boost": 20
                     }]
