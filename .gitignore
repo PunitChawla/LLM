@@ -33,7 +33,6 @@ models/
 indexes/
 *.npy
 *.jsonl
-*.csv
 *.pt
 *.bin
 *.safetensors
